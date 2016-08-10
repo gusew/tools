@@ -1,0 +1,229 @@
+#!/usr/bin/env stap
+
+#-- Global variables declaration:
+# remember id of process to analyze
+global target_pid
+# stores the filehander numbers of open files
+global filehandles
+# is incremented each time a new file is opened
+global id_counter = 1
+# stores the opened file ids of open files (key for array stores the filenames)
+global files
+
+# is incremented each time a data point was printed
+global probecounter = 0
+
+# for statistics on IO accesses
+global reads
+global writes
+global positions
+global total_io 
+
+# is set on begin of the process to calculate relative time interval
+global cpu_time_start
+
+# stores the number of cpu cycles when cycle tracking state was entered
+global cycles_milestone = 0
+# the cumulative number of cycles invested in computations of the process
+global cycles_total = 0
+
+
+probe begin {
+	target_pid = target()
+	cpu_time_start = cpu_clock_us(cpu())
+}
+
+probe syscall.open {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		cycles_stop()
+	}
+}
+
+probe syscall.open.return {
+	if (target_pid == pid() || target_pid == ppid()) {
+		filename = user_string($filename)
+		if ($return != -1) {
+			filehandles[$return] = filename
+		    positions[pid(), id_counter, execname(), filename] = 0
+		    if (files[filename] == 0) {
+		    	files[filename] = id_counter
+		    	id_counter += 1
+		    }
+		} 
+		cycles_start()
+	}
+}
+
+probe syscall.close {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		cycles_stop()
+	}
+}
+
+probe syscall.close.return {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		if ($return != -1) {
+			#positions[$fd] = 0 # mark as closed
+			#filehandles[$fd] = "deleted"		
+			positions[pid(), files[filehandles[$fd]], execname(), filehandles[$fd]] = 0
+		}
+		cycles_start()
+	}
+}
+
+probe syscall.read {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		cycles_stop()
+	}
+}
+
+probe syscall.read.return {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		reads[pid(), files[filehandles[$fd]], execname(), filehandles[$fd]] += $return
+		total_io[pid(), files[filehandles[$fd]], execname(), filehandles[$fd]] += $return
+		positions[pid(), files[filehandles[$fd]], execname(), filehandles[$fd]] += $return
+		cycles_start()
+	}
+}
+
+probe syscall.write {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		cycles_stop()
+	}
+}
+
+probe syscall.write.return {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		writes[pid(), files[filehandles[$fd]], execname(), filehandles[$fd]] += $return
+		total_io[pid(), files[filehandles[$fd]], execname(), filehandles[$fd]] += $return
+		positions[pid(), files[filehandles[$fd]], execname(), filehandles[$fd]] += $return
+		cycles_start()
+	}
+}
+
+probe syscall.dup2 {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		cycles_stop()
+	}
+}
+
+probe syscall.dup2.return {
+	#-- point a file descriptor $fildes2 to a file descriptor $fildes which remains open after the call and make them aliases
+	if (target_pid == pid() || target_pid == ppid()) {
+	 	filehandles[$return] = filehandles[$oldfd]
+		id += 1
+		cycles_start()
+	}
+}
+
+probe syscall.dup {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		cycles_stop()
+	}
+}
+
+probe syscall.dup.return {
+	#-- duplicates an existing file descriptor (create an alias for $fildes)
+	if (target_pid == pid() || target_pid == ppid()) {
+		filehandles[$return] = filehandles[$fildes] 
+		id += 1
+		cycles_start()
+	}
+}
+
+probe scheduler.cpu_off {	
+	if (target_pid == pid()) {
+		cycles_stop()	
+	}
+}
+
+probe scheduler.cpu_on {
+	if (target_pid == pid()) {
+		cycles_start()
+	}
+}
+
+probe syscall.lseek {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		cycles_stop()
+	}
+}
+
+probe syscall.lseek.return {
+	if (target_pid == pid() || target_pid == ppid()) {	
+		positions[pid(), files[filehandles[$fd]], execname(), filehandles[$fd]] = $return
+		cycles_start()
+	}
+}
+
+#-- Enter a state where invested CPU cycles are regarded
+function cycles_start() {
+	#-- if cycles were not measured before calling this function
+	if (cycles_milestone == 0) { 
+		#-- set new snapshot value for global cycles
+		cycles_milestone = get_cycles()
+	}
+	#-- else: this function was re-entered without calling "cycles_stop" in between
+	#-- then keep old milestone value
+}
+
+#-- Ignore spent CPU cycles from now on
+function cycles_stop() {
+	cycles_now = get_cycles()
+	
+	if (cycles_milestone > 0) { 
+		delta = cycles_now - cycles_milestone
+		cycles_total += delta
+		cycles_milestone = 0
+
+		return 1 # means 'true': measuring cycles was activated before
+	}
+	else {
+		return 0 # means 'false': cycles were not measured before entering this function
+	}
+}
+
+probe end {
+	cycles_stop()
+
+	#-- Output final data tuple
+	print_aggr()
+
+
+	#-- Output header column names
+	printf("#--^probe;time [1us];cycles;");
+	foreach([p, id, e, filename] in total_io) {
+		if (filename != "")
+			printf("%s (read);%s (write);%s (pos);", filename, filename, filename);
+		else
+			printf("(stdin);(stdout);(stdin/out pos);");
+	}
+	printf("\n");
+}
+
+function print_aggr() {
+	probecounter++
+	cpu_time_current = cpu_clock_us(cpu()) - cpu_time_start
+
+	printf("#---%li;%li;%li;", probecounter, cpu_time_current, cycles_total)
+	foreach([p, id, e, filename] in total_io) {
+		printf("%li;%li;%li;", reads[p, id, e, filename], writes[p, id, e, filename], positions[p, id, e, filename]);
+	}
+	printf("\n")
+
+	#delete reads
+	#delete writes
+	#delete positions
+}
+
+probe timer.ms(1) {
+	if (target_pid == pid()) {
+		cycles_activated = cycles_stop()
+
+		print_aggr()
+
+		#-- continue measuring cycles
+		if (cycles_activated) cycles_start()
+	}
+}
+

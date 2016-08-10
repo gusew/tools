@@ -1,0 +1,14 @@
+sudo stap <script> -c '<command>' -o trace.log
+
+python reprocess.py <tracelog> > trace.dat
+
+python genplots.py gnuplot-template.gpl trace.dat > plottrace.gpl
+
+gnuplot plottrace.gpl
+
+For more information on Systemtap see:
+https://sourceware.org/systemtap/man/
+
+https://sourceware.org/systemtap/langref/
+
+https://sourceware.org/systemtap/tapsets/

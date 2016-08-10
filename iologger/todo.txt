@@ -1,0 +1,6 @@
+- test iologger with multithreading programs:
+	- each thread accesses its own file
+	- multiple threads access to the same file handle (each thread reads a single line)
+
+- test iologger with errors in applications (read returns with -1 due to reading of a directory)
+

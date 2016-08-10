@@ -1,0 +1,70 @@
+#-- Common configuration for all plots
+# specify file with data
+fileprefix = "***FILEPREFIX***"
+file = "***FILENAME***"
+set datafile separator ';'
+
+# setup output file format
+set terminal png size 1920, 1280 enhanced font "Liberation,11" linewidth 1.0 background "#FFFFFF"
+
+# specify styles for data lines
+set style line 1	linetype 1	linewidth 1		pointtype 7		pointsize 1		linecolor rgb "#ECC410"
+set style line 2	linetype 1	linewidth 1		pointtype 7		pointsize 1		linecolor rgb "#2800BD"
+set style line 3	linetype 1	linewidth 1		pointtype 7		pointsize 1		linecolor rgb "#00A323"
+set style line 4	linetype 1	linewidth 1		pointtype 7		pointsize 1		linecolor rgb "#FF5123"
+set style line 5	linetype 1	linewidth 1		pointtype 7		pointsize 1		linecolor rgb "#10ECCE"
+set style line 6	linetype 1	linewidth 1		pointtype 7		pointsize 1		linecolor rgb "#F02092"
+
+
+#-- CPU cycles plot
+outfile = sprintf("%s-cycles.png", fileprefix)
+set output outfile
+
+# setup title and axis labels
+set title "CPU cycles over wall clock time"
+set xlabel "time in ms"
+set ylabel "CPU cycles"
+
+set nokey
+
+plot file using ($2/1000):3 ls 2 t "CPU cycles" #with linespoints
+
+
+#***START_IO_PLOT_TEMPLATE***
+	file using 3:***IO_COL_N*** ls ***IO_COL_STYLE*** t col(***IO_COL_N***) with linespoints, \
+#***END_IO_PLOT_TEMPLATE***
+#-- I/O plots:
+set title "IO accesses over CPU cycles"
+set xlabel "CPU cycles"
+set ylabel "I/O file accesses [Bytes]"
+
+set key outside horizontal center top
+
+outfile = sprintf("%s-readswrites.png", fileprefix)
+set output outfile
+
+plot \
+#***PLOT_FILE_MERGED***
+
+set title "Read accesses over CPU cycles"
+outfile = sprintf("%s-reads.png", fileprefix)
+set output outfile
+
+plot \
+#***PLOT_FILE_READS***
+
+
+set title "Write accesses over CPU cycles"
+outfile = sprintf("%s-writes.png", fileprefix)
+set output outfile
+
+plot \
+#***PLOT_FILE_WRITES***
+
+set title "File positions over CPU cycles"
+outfile = sprintf("%s-positions.png", fileprefix)
+set output outfile
+
+plot \
+#***PLOT_FILE_POSITIONS***
+
