@@ -2,7 +2,7 @@ include make_vars.mk
 
 .PHONY: run
 run: $(BUILD)$(APPNAME)
-	$(BUILD)$(APPNAME) 100000 1000
+	$(BUILD)$(APPNAME) 100000
 
 $(BUILD)$(APPNAME): $(BUILD)main.o
 	$(CC) $(CFLAGS) $< -o $@
@@ -17,7 +17,7 @@ $(BUILD)%.o: $(SRC)%.c
 .PHONY: valtest clean
 
 valtest: $(BUILD)$(APPNAME)
-	valgrind $(VALFLAGS) $(BUILD)$(APPNAME) 10000 1000
+	valgrind $(VALFLAGS) $(BUILD)$(APPNAME) 10000
 
 clean:
 	-@rm -r $(BUILD)
