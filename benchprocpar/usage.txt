@@ -1,0 +1,5 @@
+mein mini-Benchmark zum Testen, wie z. B. die Parallelisierbarkeit auf den RBG-Rechnern ausgenutzt werden kann. Dazu werden 1...20 parallele Prozesse auf dem Rechner gestartet und nach 10 Sekunden wieder beendet. In dieser Zwischenzeit produziert jeder Prozess in einer Endlosschleife Ausgaben. Die Gesamtanzahl an produzierten Ausgaben wird nach jedem Durchlauf addiert und ausgegeben. Wenn du diese Anzahl durch die Anzahl der Prozesse teilst, sollte in einem idealen System dieser Quotient konstant bleiben. In der Praxis bricht er jedoch schnell ein und wird sogar Null, sobald zu viele Prozesse sich eine begrenzte Anzahl an Prozessoren teilen und somit keiner der Prozesse es in den 10 Sekunden bis zum Moment der Ausgabe "schafft". 
+
+Du kannst dazu das Shellscript aufrufen mit:
+
+./mkstats.sh
