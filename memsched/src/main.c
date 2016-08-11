@@ -7,11 +7,12 @@
 
 
 void initAlloc(size_t end, char* memblock) {
-  for (size_t i = 0; i < end; ++i) {
-    memblock[i] = (char)random();
-  }
+  for (size_t i = 0; i < end; ++i)
+    memblock[i] = 1; // each cell represents 1 Byte
+    //memblock[i] = (char)random();
 }
 
+/** Do some reading and writing to the block elements. */
 void annealBlocks(size_t end, char* mblock1, char* mblock2) {
   for (size_t i = 0; i < end; ++i) {
     if (mblock1[i] > mblock2[i]) {
@@ -46,9 +47,8 @@ void printStats() {
   } 
   else if (procid > 0) { // returned the child's pid to the parent
     // if parent, then wait for a second so that the call to ps can happen "synchronously"
- sleep(1);
+    sleep(1);
     // and wait for child's termination
-    //int status;
     if (waitpid(procid, 0, 0) !=  procid) {
       printf("Error in waitpid(): %s\n", strerror(errno));
     } // else: return to mem allocation loop
@@ -57,6 +57,7 @@ void printStats() {
     printf("Error in fork(): %s\n", strerror(errno));
   }  
 }
+
 
 int main(int argc, char** argv) {
   if (argc < 2) {
@@ -70,14 +71,6 @@ int main(int argc, char** argv) {
     return 2;
   }
 
-/*
-  size_t allocSteps = atoi(argv[2]);
-  if (allocSteps <= 0) {
-    printf("Error: Invalid number of KB in a allocation step: '%s'\n", argv[2]);
-    return 2;
-  }
-  printf("Memory allocation of %lu KB in allocation steps of max. %lu KB.\n", kbytesToAlloc, allocSteps);
-*/
   const size_t allocSteps = 100000; // 100 MB [KB]
   const size_t numBlocks = kbytesToAlloc/allocSteps + 1; // number of blocks needed in total
 
@@ -94,7 +87,7 @@ int main(int argc, char** argv) {
     cntAllocNow = (cntAllocTotal + allocSteps <= kbytesToAlloc ? allocSteps : kbytesToAlloc - cntAllocTotal);
     cntAllocTotal += cntAllocNow;
 
-    memblock[blockIdx] = (char*)calloc(cntAllocNow*1000, sizeof(char));
+    memblock[blockIdx] = (char*)calloc(cntAllocNow*1000, sizeof(char)); // convert from KB to Bytes
   
     if (memblock[blockIdx] == NULL) {
       printf("Error: calloc returned NULL.\n");
@@ -106,15 +99,15 @@ int main(int argc, char** argv) {
       break;
     }
     
-    // initialize new block with random numbers
-    initAlloc(cntAllocNow, memblock[blockIdx]);
+    // initialize all elements of the new block with (random) numbers
+    initAlloc(cntAllocNow*1000, memblock[blockIdx]);
 
     // anneal two different blocks in order to have some reads and writes
+    /*
     for (size_t i = 0, j = blockIdx; i < j; ++i, --j) {
-      annealBlocks(cntAllocNow, memblock[i], memblock[j]);
+      annealBlocks(cntAllocNow*1000, memblock[i], memblock[j]);
     }
-//    unsigned addToBlockIdx = (blockIdx > 0 ? cntAllocTotal % blockIdx : 0);
-//    addToPrevBlock(cntAllocNow, memblock[addToBlockIdx]);
+    */
 
     printf("Currently, %lu KB of memory are allocated at address %p (out of %lu KB).\n", cntAllocNow, memblock[blockIdx], cntAllocTotal);
     printStats();
@@ -128,10 +121,10 @@ int main(int argc, char** argv) {
   long int totalBlockSum = 0;
   for (unsigned i = 0; i < blockIdx; ++i) {
     if (i < (blockIdx - 1)) {
-      totalBlockSum += sumOneBlock(allocSteps, memblock[i]);
+      totalBlockSum += sumOneBlock(allocSteps*1000, memblock[i]);
     }
     else {
-      totalBlockSum += sumOneBlock(cntAllocNow, memblock[i]);
+      totalBlockSum += sumOneBlock(cntAllocNow*1000, memblock[i]);
     }
 
     free(memblock[i]);
