@@ -8,8 +8,7 @@
 
 void initAlloc(size_t end, char* memblock) {
   for (size_t i = 0; i < end; ++i)
-    memblock[i] = 1; // each cell represents 1 Byte
-    //memblock[i] = (char)random();
+    memblock[i] = (char)random();
 }
 
 /** Do some reading and writing to the block elements. */
@@ -47,7 +46,7 @@ void printStats() {
   } 
   else if (procid > 0) { // returned the child's pid to the parent
     // if parent, then wait for a second so that the call to ps can happen "synchronously"
-    sleep(1);
+//    sleep(1);
     // and wait for child's termination
     if (waitpid(procid, 0, 0) !=  procid) {
       printf("Error in waitpid(): %s\n", strerror(errno));
@@ -99,8 +98,9 @@ int main(int argc, char** argv) {
       break;
     }
     
-    // initialize all elements of the new block with (random) numbers
-    initAlloc(cntAllocNow*1000, memblock[blockIdx]);
+    // initialize all elements of the new block
+    //initAlloc(cntAllocNow*1000, memblock[blockIdx]); // with random numbers
+    memset(memblock[blockIdx], 1, cntAllocNow*1000); // with constant values
 
     // anneal two different blocks in order to have some reads and writes
     /*
