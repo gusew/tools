@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
   const size_t allocSteps = 100000; // 100 MB [KB]
   const size_t numBlocks = kbytesToAlloc/allocSteps + 1; // number of blocks needed in total
 
-  srandom(kbytesToAlloc);
+  srandom(kbytesToAlloc); // prevent an intelligent compiler from optimizing the allocation calls
 
   char** memblock = NULL; // let each block become as large as step size
   memblock = (char**)calloc(numBlocks, sizeof(char*));
