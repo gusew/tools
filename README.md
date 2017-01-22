@@ -1,4 +1,4 @@
-# wtools - A collection of small tools for evaluations
+# A collection of small tools for evaluations
 
 ## Tools
 
