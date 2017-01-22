@@ -1,4 +1,4 @@
-# wtools - memsched
+# memsched
 
 ## Intended purpose 
 
