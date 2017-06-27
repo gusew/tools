@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
   std::cout << "The magic result of the calculation is: " << std::to_string(divcounter) << std::endl;
 
   
-  // ... and the read the file from end to beginning
+  // ... and then read the file from end to beginning
   unsigned haveReadRE = 0;
   fhandle.seekg(-1, fhandle.cur);
 
