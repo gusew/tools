@@ -16,20 +16,12 @@ $(BUILD)$(APPNAME): $(OBJECTS)
 # |
 # | *** Compile files ***
 # | 
-$(BUILD)%.o: %.cpp %.hpp
+$(BUILD)%.o: $(SRC)%.cpp $(SRC)%.hpp
 	$(MKDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# |
-# | *** Copy some other necessary files to build directory. ***
-# | 
-#copy_other_files: 
-#	-cp file $(BUILD)
-#	-ln -s symfile $(BUILD)link
 
-# |
 # | *** Targets for other tools. ***
-# |
 .PHONY: valtest 
 valtest: $(BUILD)$(APPNAME)
 	valgrind $(VALFLAGS) $(BUILD)$(APPNAME)
