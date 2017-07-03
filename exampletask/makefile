@@ -1,21 +1,10 @@
 include makefile.vars
 
-# |
-# | *** Run compiled and linked executable ***
-# | 
-.PHONY: run
-run: $(BUILD)$(APPNAME) 
-	$(BUILD)$(APPNAME) 
-
-# |
 # | *** Link all compiled object files to executable ***
-# | 
 $(BUILD)$(APPNAME): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $^ -o $@ 
 
-# |
 # | *** Compile files ***
-# | 
 $(BUILD)%.o: $(SRC)%.cpp $(SRC)%.hpp
 	$(MKDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -29,4 +18,15 @@ valtest: $(BUILD)$(APPNAME)
 .PHONY: clean
 clean:
 	-@rm -r $(BUILD)
+
+# | *** Targets for js compilation ***
+.PHONY: jscompile
+jscompile: $(BUILD)$(APPNAME).js
+
+$(BUILD)$(APPNAME).js: $(OBJECTS_JS)
+	$(EMCC) $(EMCCFLAGS) $^ -o $@
+
+$(BUILD)js/%.o: $(SRC)%.cpp $(SRC)%.hpp
+	$(MKDIR)
+	$(EMCC) $(EMCCFLAGS) -c $< -o $@
 
