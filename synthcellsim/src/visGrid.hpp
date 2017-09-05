@@ -12,39 +12,16 @@ const unsigned MIN_DIM = (HEIGHT < WIDTH ? HEIGHT : WIDTH);
  */
 
 const std::string SVG_HEADER = "\
-<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n\
-<svg\n\
- xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n\
- xmlns:cc=\"http://creativecommons.org/ns#\"\n\
- xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n\
- xmlns:svg=\"http://www.w3.org/2000/svg\"\n\
- xmlns=\"http://www.w3.org/2000/svg\"\n\
- version=\"1.1\"\n\
- id=\"svg2\"\n\
- viewBox=\"0 0 800 600\"\n\
- height=\"600px\"\n\
- width=\"800px\">\n\
-<defs\n\
- id=\"defs4\" />\n\
-<metadata\n\
- id=\"metadata7\">\n\
-<rdf:RDF>\n\
-<cc:Work\n\
- rdf:about=\"\">\n\
-<dc:format>image/svg+xml</dc:format>\n\
-<dc:type\n\
- rdf:resource=\"http://purl.org/dc/dcmitype/StillImage\" />\n\
-<dc:title></dc:title>\n\
-</cc:Work>\n\
-</rdf:RDF>\n\
-</metadata>\n\
-<g\n\
- id=\"layer1\">\n\
+<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n\
+<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\
+ height=\"600px\" width=\"800px\">\n\
+<title>Grid Visualization</title>\n\
+<desc>This is a graphic visualization of a numerical grid</desc>\n\
 ";
 
-const std::string SVG_FOOTER = "\
-</g>\n\
-</svg>\n\
-";
+const std::string SVG_DEFS_HEADER = "<defs>";
+const std::string SVG_DEFS_FOOTER = "</defs>";
+
+const std::string SVG_FOOTER = "\n</svg>";
 
 #endif /* VISGRID_HPP */

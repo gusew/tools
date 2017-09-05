@@ -71,6 +71,11 @@ int main(int argc, char** argv) {
     return 4;
   }
 
+  // create defs-block that contains the outer dimensions of each cell
+  outfhandle << SVG_DEFS_HEADER << std::endl;
+  outfhandle << "<rect id=\"cell\" height=\"" << std::to_string(CELL_SIZE) << "\" width=\"" << std::to_string(CELL_SIZE) << "\" />" << std::endl;  
+  outfhandle << SVG_DEFS_FOOTER << std::endl;
+
   // obtain min and max values for adaptive color coding
   double tmpVal = 0.0;
   double statMin = 0.0;
@@ -98,10 +103,8 @@ int main(int argc, char** argv) {
       posX = 2 + x * CELL_SIZE;
       colorValue = (uint8_t)( (g.getCell(x, y) - statMin) / VALRANGE * 255); // normalize: (val-min) / (max-min)
 
-      outfhandle << "<rect y=\"" << std::to_string(posY) << "\" x=\"" << std::to_string(posX) << 
-        "\" height=\"" << std::to_string(CELL_SIZE) << "\" width=\"" << std::to_string(CELL_SIZE) << 
-        "\" id=\"cell" << std::to_string(x) << "_" << std::to_string(y) << 
-        "\" style=\"fill:#00" << conv2Hex(colorValue >> 4) << conv2Hex(colorValue) << "00;\" />" << std::endl;
+      outfhandle << "<use y=\"" << std::to_string(posY) << "\" x=\"" << std::to_string(posX) <<
+        "\" xlink:href=\"#cell\" style=\"fill:#00" << conv2Hex(colorValue >> 4) << conv2Hex(colorValue) << "00;\" />" << std::endl;
     }
   }
 
