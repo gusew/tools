@@ -3,6 +3,7 @@
 #include "ReplaceInstructions.hpp"
 #include "FileHandler.hpp"
 #include "SearchReplace.hpp"
+#include <sstream>
 
 
 void printUsage(char* progname) {
@@ -77,14 +78,25 @@ int main(int argc, char** argv) {
       return 2;
     }
     std::fstream& instrhdl(fh.handle());
+    std::stringbuf tmp;
+    std::string search, replace;
+    unsigned line = 0;
     // format: linewise, first line: search string, second line: replacement string
     while (instrhdl.good()) {
-      std::string search, replace;
-      instrhdl >> search;
-      instrhdl >> replace;
-//      std::cout << "instruction: '" << search << "' -> '" << replace << "'." << std::endl;
-      if (search.length() > 0)
-        instr.insertInstruction(search, replace);
+      tmp.str("");
+      instrhdl.get(tmp, '\n');
+      instrhdl.get(); // ignore line break
+      
+      if (line % 2 == 0) { // get search string
+        search = tmp.str();
+      }
+      else {
+        replace = tmp.str();
+//        std::cout << "instruction: '" << search << "' -> '" << replace << "'." << std::endl;
+        if (search.length() > 0 && search.compare(SEPARATOR) != 0)
+          instr.insertInstruction(search, replace);
+      }
+      ++line;
     }
   }
 
