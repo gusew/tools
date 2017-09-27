@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
       sumSquares += tmpDiff*tmpDiff;
     }
   }
-  double statStddev = 1/sqrt(cellLimit-1) * sqrt(sumSquares); 
+  double statStddev = sqrt( sumSquares / (cellLimit-1) ); 
 
   FileHandler fout(outfile);
   if (!fout.openwrite()) {
