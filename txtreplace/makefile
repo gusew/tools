@@ -32,6 +32,21 @@ $(BUILD)%.to: $(SRC)%.cpp $(SRC)%.hpp
 #	valgrind $(VALFLAGS) $(BUILD)writeread /tmp/test_fio_writeread 10000
 #	rm /tmp/test_fio_writeread
 
+#-----------------------------------------------------------------------
+
+.PHONY: deploy 
+deploy: $(LINK_DIR)$(PROGNAME)
+	@echo "The tool $(PROGNAME) was successfully deployed."
+
+$(LINK_DIR)$(PROGNAME): $(DEPLOY_DIR)$(PROGNAME)
+	ln -s $< $(LINK_DIR)$(PROGNAME)
+
+$(DEPLOY_DIR)$(PROGNAME): $(BUILD)$(PROGNAME)
+	mkdir $(DEPLOY_DIR)
+	cp $< $(DEPLOY_DIR)
+
+#-----------------------------------------------------------------------
+
 .PHONY: clean
 clean:
 	-@rm -r $(BUILD)

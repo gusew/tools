@@ -43,6 +43,10 @@ OBJECTS		= \
 TESTS_ALL	= \
 	$(TESTDIR)SearchReplace.test
 
+# paths for deployment
+DEPLOY_DIR	= /home/wlad/system/txtreplace/
+LINK_DIR	= /usr/local/bin/
+
 # flags for running valgrind (memcheck)
 VALFLAGS	= --tool=memcheck --leak-check=yes
 
