@@ -113,7 +113,7 @@ bool searchForKeys(const std::string& sep, std::istream& input, std::ostream& ou
   while (input.good()) {
     if (stateId == 1) {
       // extract characters from input as long as no special character is encountered
-      input.get(nullptr, sep[0]);
+      input.get(bufferTmp, sep[0]); // as writing to nullptr leads to segmentation fault
       if (input.gcount() == 0 && input.fail() && !input.eof()) { // prevent from setting failbit to true
         input.clear();
       }
