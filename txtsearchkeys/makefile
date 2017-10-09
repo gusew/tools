@@ -10,20 +10,20 @@ $(BUILD)%.o: $(SRC)%.cpp $(SRC)%.hpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # create and run all unit tests
-.PHONY: utest
-utest: $(TESTS_ALL)
-	@echo "\nStart unit tests for the search and replace function."
-	@$(TESTDIR)SearchReplace.test
+#.PHONY: utest
+#utest: $(TESTS_ALL)
+#	@echo "\nStart unit tests for the search and replace function."
+#	@$(TESTDIR)SearchReplace.test
 
 # link object files for unit tests
-$(TESTDIR)SearchReplace.test: $(BUILD)SearchReplace.to $(BUILD)ReplaceInstructions.o
-	$(MKDIR)
-	$(CC) $^ -o $@
+#$(TESTDIR)SearchReplace.test: $(BUILD)SearchReplace.to $(BUILD)ReplaceInstructions.o
+#	$(MKDIR)
+#	$(CC) $^ -o $@
 
 # create object files for unit tests
-$(BUILD)%.to: $(SRC)%.cpp $(SRC)%.hpp
-	$(MKDIR)
-	$(CC) $(CFLAGS) $(TESTFLAG) -c $< -o $@
+#$(BUILD)%.to: $(SRC)%.cpp $(SRC)%.hpp
+#	$(MKDIR)
+#	$(CC) $(CFLAGS) $(TESTFLAG) -c $< -o $@
 
 
 #.PHONY: valtest_wr valtest_rw valtest_rc valtest_sj valtest_ww clean
