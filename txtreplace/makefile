@@ -39,7 +39,7 @@ deploy: $(LINK_DIR)$(PROGNAME)
 	@echo "The tool $(PROGNAME) was successfully deployed."
 
 $(LINK_DIR)$(PROGNAME): $(DEPLOY_DIR)$(PROGNAME)
-	ln -s $< $(LINK_DIR)$(PROGNAME)
+	ln -fs $< $(LINK_DIR)$(PROGNAME)
 
 $(DEPLOY_DIR)$(PROGNAME): $(BUILD)$(PROGNAME)
 	mkdir -p $(DEPLOY_DIR)
