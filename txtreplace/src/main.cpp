@@ -57,6 +57,12 @@ int main(int argc, char** argv) {
     else if (param.compare("-o") == 0)
       specifyOutpath = true;
   }
+  // in case same file is written, as is read, warn user
+  if (inpath.length() > 0 && outpath.length() > 0 && inpath.compare(outpath) == 0) {
+    std::cerr << "Warning! Identical files specified for input and output. Result will be empty." << std::endl;
+    std::cerr << "Press Ctrl+C for aborting this operation." << std::endl;
+    std::cin.get();
+  }
 
 // DEBUG:
 //  std::cout << "separator: \"" << SEPARATOR << "\"" << std::endl;
