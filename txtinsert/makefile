@@ -16,7 +16,7 @@ $(BUILD)%.o: $(SRC)%.cpp $(SRC)%.hpp
 #	@$(TESTDIR)SearchReplace.test
 
 # link object files for unit tests
-#$(TESTDIR)SearchReplace.test: $(BUILD)SearchReplace.to $(BUILD)ReplaceInstructions.o
+#$(TESTDIR)SearchInsert.test: $(BUILD)SearchInsert.to
 #	$(MKDIR)
 #	$(CC) $^ -o $@
 
